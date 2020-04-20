@@ -1,0 +1,31 @@
+Ajedrez
+Metodologia de la Investigacion
+Profesor: Carlos Rodriguez
+
+integrantes: Alaniz Gabriel,Mazuran Ignacio,Valls Mauro, Pablo Muller.
+
+
+Proyecto:
+
+Para nuestro proyecto final de la materia decidimos crear un juego de ajedrez de dificultad normal con mínima interfaz gráfica de usuario.
+
+Lenguaje:
+
+El lenguaje que utilizaremos para programar el proyecto será Python (versión 3) y la librería PyGame para la interfaz gráfica.
+
+IDE:
+
+iDE: entorno sublime text 3.
+GRÁFICOS: librería PyGame
+
+Alcance:
+El juego tendrá una sola dificultad de nivel normal, y consistirá en una partida del usuario contra la computadora. Además crearemos una interfaz gráfica con pygame para correr el programa. 
+
+Documentación :
+
+Para documentar el progreso del proyecto usaremos un documento de Google Drive compartido entre los integrantes.
+
+Sistema operativo y distribución utilizada para correr el programa:
+ 
+sistema operativo:Linux 
+distribución: UBUNTU 
