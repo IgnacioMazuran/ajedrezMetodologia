@@ -64,3 +64,48 @@ class Juega:
         FEN_str += ' {}'.format(self.halfmove_clock)
         FEN_str += ' {}'.format(self.fullmove_number)
         return FEN_str
+
+    def load_FEN(self, FEN_str):
+        FEN_list = FEN_str.split(' ')
+        
+        tablero_str = FEN_list[0]
+        rango_list = tablero_str.split('/')
+        rango_list.reverse()
+        self.tablero = []
+
+        for rango in rango_list:
+            rango_piezas = []
+            for p in rango:
+                if p.isdigit():
+                    for _ in range(int(p)):
+                        rango_piezas.append(VACIO)
+                else:
+                    rango_piezas.append(pieza_str(p))
+            self.tablero.extend(rango_piezas)
+
+        mueve_prim_str = FEN_list[1].lower()
+        if mueve_prim_str == 'b':
+            self.mueve_prim = BLANCO
+        if mueve_prim_str == 'n':
+            self.mueve_prim = NEGRO
+
+        enroque_reglas_str = FEN_list[2]
+        self.enroque_reglas = 0
+        if enroque_reglas_str.find('K') >= 0:
+            self.enroque_reglas |= ENROCAR_KINGSIDE_BLANCO
+        if enroque_reglas_str.find('Q') >= 0:
+            self.enroque_reglas |= ENROCAR_QUEENSIDE_BLANCO
+        if enroque_reglas_str.find('k') >= 0:
+            self.enroque_reglas |= ENROCAR_KINGSIDE_NEGRO
+        if enroque_reglas_str.find('q') >= 0:
+            self.enroque_reglas |= ENROCAR_QUEENSIDE_NEGRO
+
+        ep_str = FEN_list[3]
+        if ep_str == '-':
+            self.ep_casill = 0
+        else:
+            self.ep_casill = str2bb(ep_str)
+        
+        self.halfmove_clock = int(FEN_list[4])
+        self.fullmove_number = int(FEN_list[5])
+
