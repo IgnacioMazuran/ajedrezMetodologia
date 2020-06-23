@@ -508,6 +508,9 @@ def get_filtro(filtro_str):
         return get_fila(filtro_str)
     if filtro_str in RANGOS:
         return get_rango(filtro_str)
+
+  #MOVIMIENTOS DE LOS PEONES
+
 def get_peones_total(tablero):
     return list2int([ i&PIEZA_MASK == PEON for i in tablero ])  #obtiene todos los peones del tablero
 
@@ -517,10 +520,10 @@ def get_peones(tablero, color):  #obtiene todos los peones de un color y del otr
 def peon_movimientos(moviendo_pieza, juega, color): #obtiene  el peon que fue movido o desplazado tomando como referencia su color
     return peon_avance(moviendo_pieza, juega.tablero, color) | peon_capturas(moviendo_pieza, juega, color)
 
-def peon_capturas(moviendo_pieza, juega, color):
+def peon_capturas(moviendo_pieza, juega, color): #obtien o captura el espacio que queda libre o vacio luego del moviemiento de el peon
     return peon_simple_capturas(moviendo_pieza, juega, color) | peon_ep_capturas(moviendo_pieza, juega, color)
 
-def peon_avance(moviendo_pieza, tablero, color):
+def peon_avance(moviendo_pieza, tablero, color): #obtiene el ataque del peon y la pieza que fue atacada tomando como referencia el color del peon
     return peon_simple_avance(moviendo_pieza, tablero, color) | peon_doble_avance(moviendo_pieza, tablero, color)
 
 def peon_simple_capturas(atacando_pieza, juega, color): #obtiene el ataque del peon y la pieza que fue atacada tomando como referencia el color del peon
@@ -536,19 +539,19 @@ def peon_ep_capturas(atacando_pieza, juega, color):  #retorna el rango y color d
 def peon_ataca(atacando_pieza, tablero, color):  #retorna los peones que atacaron tomado como referencia el este y oeste del tablero
     return peon_este_ataca(atacando_pieza, tablero, color) | peon_oeste_ataca(atacando_pieza, tablero, color)
 
-def peon_simple_avance(moviendo_pieza, tablero, color):
+def peon_simple_avance(moviendo_pieza, tablero, color): #retorna el empujon o mivimiento del peon de acuerdo a su color y el cuadrado vacio que tiene  disponible
     if color == BLANCO:
         return lado_norte(moviendo_pieza) & vacio_casilleros(tablero)
     if color == NEGRO:
         return lado_sur(moviendo_pieza) & vacio_casilleros(tablero)
 
-def peon_doble_avance(moviendo_pieza, tablero, color):
+def peon_doble_avance(moviendo_pieza, tablero, color): #retorna el doble avance de un peon(cuando ataqca ) y retorna su espacio disponible
     if color == BLANCO:
         return lado_norte(peon_simple_avance(moviendo_pieza, tablero, color)) & (vacio_casilleros(tablero) & RANGO_4)
     if color == NEGRO:
         return lado_sur(peon_simple_avance(moviendo_pieza, tablero, color)) & (vacio_casilleros(tablero) & RANGO_5)
 
-def peon_este_ataca(atacando_pieza, tablero, color):
+def peon_este_ataca(atacando_pieza, tablero, color): #retorna los ataque de los peones hacia el lado este
     if color == BLANCO:
         return lado_NE(atacando_pieza & get_piezas_color(tablero, color))
     if color == NEGRO:
@@ -560,20 +563,20 @@ def peon_oeste_ataca(atacando_pieza, tablero, color):
     if color == NEGRO:
         return lado_SO(atacando_pieza & get_piezas_color(tablero, color))
 
-def peon_doble_ataca(atacando_pieza, tablero, color):
+def peon_doble_ataca(atacando_pieza, tablero, color): #retorna cuando un peon tuvo la posibilidad de atacar hacia ambos lados
     return peon_este_ataca(atacando_pieza, tablero, color) & peon_este_ataca(atacando_pieza, tablero, color)
 
-def doble_avance(abandona_casillero, destino_casillero):
+def doble_avance(abandona_casillero, destino_casillero): #posicion del peon y poicion objetivo del peon siempre de dos en dos
     return (abandona_casillero&RANGO_2 and destino_casillero&RANGO_4) or \
            (abandona_casillero&RANGO_7 and destino_casillero&RANGO_5)
 
-def new_ep_casill(abandona_casillero):
+def new_ep_casill(abandona_casillero): #retorna la posicion del cuadrado que el peon deja libre norte o sur
     if abandona_casillero&RANGO_2:
         return lado_norte(abandona_casillero)
     if abandona_casillero&RANGO_7:
         return lado_sur(abandona_casillero)
 
-def remueve_ep_capturado(juega):
+def remueve_ep_capturado(juega): #imprime nuevo tablero con los espacios disponibles para el sector norte y sector sur
     new_tablero = deepcopy(juega.tablero)
     if juega.ep_casill & RANGO_3:
         new_tablero[bb2index(lado_norte(juega.ep_casill))] = VACIO
@@ -587,10 +590,10 @@ def remueve_ep_capturado(juega):
 def get_caballos(tablero, color):
     return list2int([ i == color|CABALLO for i in tablero ])
 
-def caballo_movimientos(moviendo_pieza, tablero, color):
+def caballo_movimientos(moviendo_pieza, tablero, color): #retorna las posibilidad de ataque que tienen los caballos
     return caballo_ataca(moviendo_pieza) & nnot(get_piezas_color(tablero, color))
 
-def caballo_ataca(moviendo_pieza):
+def caballo_ataca(moviendo_pieza): #retorna el moviemiento de ataque de los caballos
     return caballo_NNE(moviendo_pieza) | \
            caballo_ENE(moviendo_pieza) | \
            caballo_NNO(moviendo_pieza) | \
@@ -600,37 +603,37 @@ def caballo_ataca(moviendo_pieza):
            caballo_SSO(moviendo_pieza) | \
            caballo_OSO(moviendo_pieza)
 
-def caballo_ONO(moviendo_pieza):
+def caballo_ONO(moviendo_pieza): #retorna el moviemiento de los caballos (no de su ataque) de la fila A a fila F
     return moviendo_pieza << 6 & nnot(FILA_G | FILA_H)
 
-def caballo_ENE(moviendo_pieza):
+def caballo_ENE(moviendo_pieza):  #retorna el moviemiento de los caballos (no de su ataque) de la fila C a fila G
     return moviendo_pieza << 10 & nnot(FILA_A | FILA_B)
 
-def caballo_NNO(moviendo_pieza):
+def caballo_NNO(moviendo_pieza): #retorna el moviemiento de los caballos (no de su ataque) de la fila A a fila G
     return moviendo_pieza << 15 & nnot(FILA_H)
 
-def caballo_NNE(moviendo_pieza):
+def caballo_NNE(moviendo_pieza): #retorna el moviemiento de los caballos (no de su ataque) de la fila B a fila H
     return moviendo_pieza << 17 & nnot(FILA_A)
 
-def caballo_ESE(moviendo_pieza):
+def caballo_ESE(moviendo_pieza): #retorna el moviemiento de los caballos (no de su ataque) de la fila B a fila H
     return moviendo_pieza >> 6 & nnot(FILA_A | FILA_B)
 
-def caballo_OSO(moviendo_pieza):
+def caballo_OSO(moviendo_pieza): #retorna el moviemiento de los caballos sector opuesto del tablero (no de su ataque) de la fila A a fila F
     return moviendo_pieza >> 10 & nnot(FILA_G | FILA_H)
 
-def caballo_SSE(moviendo_pieza):
+def caballo_SSE(moviendo_pieza): #retorna el moviemiento de los caballos sector opuesto del tablero (no de su ataque) de la fila B a fila H
     return moviendo_pieza >> 15 & nnot(FILA_A)
 
-def caballo_SSO(moviendo_pieza):
+def caballo_SSO(moviendo_pieza): #retorna el moviemiento de los caballos sector opuesto del tablero(no de su ataque) de la fila A a fila G
     return moviendo_pieza >> 17 & nnot(FILA_H)
 
-def caballo_llena(moviendo_pieza, n):
+def caballo_llena(moviendo_pieza, n): #retorna posicion llena o ocupada por el caballo luego del ataque
     llena = moviendo_pieza
     for _ in range(n):
         llena |= caballo_ataca(llena)
     return llena
 
-def caballo_distancia(pos1, pos2):
+def caballo_distancia(pos1, pos2): #retorna distancia recorrido por el cabblo posicion inicial y posicion final que es la que ocupara
     init_bitboard = str2bb(pos1)
     end_bitboard = str2bb(pos2)
     llena = init_bitboard
@@ -645,15 +648,15 @@ def caballo_distancia(pos1, pos2):
 def get_king(tablero, color):
     return list2int([ i == color|KING for i in tablero ])
 
-def king_movimientos(moviendo_pieza, tablero, color):
+def king_movimientos(moviendo_pieza, tablero, color): #retorna los posibles movimientos de ataque del rey
     return king_ataca(moviendo_pieza) & nnot(get_piezas_color(tablero, color))
 
-def king_ataca(moviendo_pieza):
+def king_ataca(moviendo_pieza): #retorna el moviemiento de aqtque que efectuo el rey
     king_atq = moviendo_pieza | lado_este(moviendo_pieza) | lado_oeste(moviendo_pieza)
     king_atq |= lado_norte(king_atq) | lado_sur(king_atq)
     return king_atq & nnot(moviendo_pieza)
 
-def puede_enrocar_kingside(juega, color):
+def puede_enrocar_kingside(juega, color):  #retorna el espacio o sector disponible que tiene el rey para el enroque en su lado tomando como referencia su color
     if color == BLANCO:
         return (juega.enroque_reglas & ENROCAR_KINGSIDE_BLANCO) and \
                 juega.tablero[str2index('f1')] == VACIO and \
@@ -669,7 +672,7 @@ def puede_enrocar_kingside(juega, color):
                 (not bajo_ataque(str2bb('f8'), juega.tablero, opuesto_color(color))) and \
                 (not bajo_ataque(str2bb('g8'), juega.tablero, opuesto_color(color)))
 
-def puede_enrocar_queenside(juega, color):
+def puede_enrocar_queenside(juega, color):  #retorna el espacio o sector disponible que tiene el rey  para  el enroque del lado de la reina tomando como referencia su color
     if color == BLANCO:
         return (juega.enroque_reglas & ENROCAR_QUEENSIDE_BLANCO) and \
                 juega.tablero[str2index('b1')] == VACIO and \
@@ -687,54 +690,54 @@ def puede_enrocar_queenside(juega, color):
                 (not bajo_ataque(str2bb('d8'), juega.tablero, opuesto_color(color))) and \
                 (not bajo_ataque(str2bb('e8'), juega.tablero, opuesto_color(color)))
 
-def enrocar_kingside_movim(juega):
+def enrocar_kingside_movim(juega): #retorna la posicion en la que quedo el rey luego de su moviemiento enroque
     if juega.mueve_prim == BLANCO:
         return (str2bb('e1'), str2bb('g1'))
     if juega.mueve_prim == NEGRO:
         return (str2bb('e8'), str2bb('g8'))
 
-def enrocar_queenside_movim(juega):
+def enrocar_queenside_movim(juega): #retorna la posicion en la que quedo el rey luego de su moviemiento enroque del lado de la reina
     if juega.mueve_prim == BLANCO:
         return (str2bb('e1'), str2bb('c1'))
     if juega.mueve_prim == NEGRO:
         return (str2bb('e8'), str2bb('c8'))
 
-def remueve_enroque_reglas(juega, removidas_reglas):
+def remueve_enroque_reglas(juega, removidas_reglas): #remueve la posibilidad de enroque del jugador
     return juega.enroque_reglas & ~removidas_reglas
 
 # ========== ALFIL ==========
 
-def get_alfiles(tablero, color):
+def get_alfiles(tablero, color): #obtiene ALFIL segun su color
     return list2int([ i == color|ALFIL for i in tablero ])
 
-def alfil_linea(moviendo_pieza):
+def alfil_linea(moviendo_pieza): #retorna moviemiento disponible para  Afil(direccion aceptada)
     return linea_diag(moviendo_pieza) | linea_anti_diag(moviendo_pieza)
 
-def linea_diag(moviendo_pieza):
+def linea_diag(moviendo_pieza): #retorna movimiento en sentido diagonal
     return NE_linea(moviendo_pieza) | SO_linea(moviendo_pieza)
 
-def linea_anti_diag(moviendo_pieza):
+def linea_anti_diag(moviendo_pieza):  #retorna movimiento en sentido antidiagonal
     return NO_linea(moviendo_pieza) | SE_linea(moviendo_pieza)
 
-def linea_NE(moviendo_pieza):
+def linea_NE(moviendo_pieza): #retorna total de los cuadrados disponibles para el ataque del alfil en un rango de 6 sector noreste
     linea_atq = lado_NE(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_NE(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_SE(moviendo_pieza):
+def linea_SE(moviendo_pieza): #retorna total de los cuadrados disponibles para el ataque del alfil en un rango de 6 sector sureste
     linea_atq = lado_SE(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_SE(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_NO(moviendo_pieza):
+def linea_NO(moviendo_pieza): #retorna total de los cuadrados disponibles para el ataque del alfil en un rango de 6 sector noroeste
     linea_atq = lado_NO(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_NO(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_SO(moviendo_pieza):
+def linea_SO(moviendo_pieza):  #retorna total de los cuadrados disponibles para el ataque del alfil en un rango de 6 sector suroeste
     linea_atq = lado_SO(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_SO(linea_atq)
@@ -742,47 +745,47 @@ def linea_SO(moviendo_pieza):
 
 
 
-def ataca_NE(pieza_indiv, tablero, color):
+def ataca_NE(pieza_indiv, tablero, color):  #retorna el ataque del alfil tomando como referencia si esta ocupado el cuadrado o no sector noreste
     bloq = lsb(linea_NE(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_NE(pieza_indiv) ^ linea_NE(bloq)
     else:
         return linea_NE(pieza_indiv)
 
-def ataca_NO(pieza_indiv, tablero, color):
+def ataca_NO(pieza_indiv, tablero, color): #retorna el ataque del alfil tomando como referencia si esta ocupado el cuadrado o no sector noroeste
     bloq = lsb(linea_NO(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_NO(pieza_indiv) ^ linea_NO(bloq)
     else:
         return linea_NO(pieza_indiv)
 
-def ataca_SE(pieza_indiv, tablero, color):
+def ataca_SE(pieza_indiv, tablero, color): #retorna el ataque del alfil tomando como referencia si esta ocupado el cuadrado o no sector sureste
     bloq = msb(linea_SE(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_SE(pieza_indiv) ^ linea_SE(bloq)
     else:
         return linea_SE(pieza_indiv)
 
-def ataca_SO(pieza_indiv, tablero, color):
+def ataca_SO(pieza_indiv, tablero, color):  #retorna el ataque del alfil tomando como referencia si esta ocupado el cuadrado o no sector suroeste
     bloq = msb(linea_SO(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_SO(pieza_indiv) ^ linea_SO(bloq)
     else:
         return linea_SO(pieza_indiv)
 
-def diagonal_ataca(pieza_indiv, tablero, color):
+def diagonal_ataca(pieza_indiv, tablero, color): #retorna el color  del alfil que ataco de neste a suroeste(diagonal)
     return ataca_NE(pieza_indiv, tablero, color) | ataca_SO(pieza_indiv, tablero, color)
 
-def anti_diagonal_ataca(pieza_indiv, tablero, color):
+def anti_diagonal_ataca(pieza_indiv, tablero, color): #retorna el color  del alfil que ataco de noroeste a sureste(diagonal)
     return ataca_NO(pieza_indiv, tablero, color) | ataca_SE(pieza_indiv, tablero, color)
 
-def alfil_ataca(moviendo_pieza, tablero, color):
+def alfil_ataca(moviendo_pieza, tablero, color): #retorna el ataque en diagonal y antidiagonal
     atq = 0
     for pieza in indiv_gen(moviendo_pieza):
         atq |= diagonal_ataca(pieza, tablero, color) | anti_diagonal_ataca(pieza, tablero, color)
     return atq
 
-def alfil_movimientos(moviendo_pieza, tablero, color):
+def alfil_movimientos(moviendo_pieza, tablero, color):  #retorna el espacio en tablero utilizado para el ataque del alfil tomando como referencia los colores del tablero
     return alfil_ataca(moviendo_pieza, tablero, color) & nnot(get_piezas_color(tablero, color))
 
 # ========== TORRES ==========
@@ -790,80 +793,80 @@ def alfil_movimientos(moviendo_pieza, tablero, color):
 def get_torres(board, color):
     return list2int([ i == color|TORRE for i in tablero ])
 
-def torre_lineas(moviendo_pieza):
+def torre_lineas(moviendo_pieza): #retorna moviemiento disponible para  TORRES(FILAS Y RANGOS)
     return rango_lineas(moviendo_pieza) | fila_lineas(moviendo_pieza)
 
-def rango_lineas(moviendo_pieza):
+def rango_lineas(moviendo_pieza): #retorna moviemiento disponible para  TORRES(ESTE Y OESTE)
     return linea_este(moviendo_pieza) | linea_oeste(moviendo_pieza)
 
-def fila_lineas(moviendo_pieza):
+def fila_lineas(moviendo_pieza): #retorna moviemiento disponible para  TORRES(FILAS NORTE A SUR)
     return linea_norte(moviendo_pieza) | linea_sur(moviendo_pieza)
 
-def linea_este(moviendo_pieza):
+def linea_este(moviendo_pieza): #retorna moviemiento disponible para ataque  de torres(desde el este)
     linea_atq = lado_este(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_este(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_oeste(moviendo_pieza):
+def linea_oeste(moviendo_pieza): #retorna moviemiento disponible para ataque  de torres(desde el oeste)
     linea_atq = lado_oeste(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_oeste(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_norte(moviendo_pieza):
+def linea_norte(moviendo_pieza): #retorna moviemiento disponible para ataque  de torres(desde el norte)
     linea_atq = lado_norte(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_norte(linea_atq)
     return linea_atq & CASILLEROS
 
-def linea_sur(moviendo_pieza):
+def linea_sur(moviendo_pieza): #retorna moviemiento disponible para ataque  de torres(desde el sur)
     linea_atq = lado_sur(moviendo_pieza)
     for _ in range(6):
         linea_atq |= lado_sur(linea_atq)
     return linea_atq & CASILLEROS
 
-def ataca_este(pieza_indiv, tablero, color):
+def ataca_este(pieza_indiv, tablero, color): #retorna moviemientos  de  ataque  de torres(desde el este) tomando como referencia si el cuadrado esta bloquedado
     bloq = lsb(linea_este(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_este(pieza_indiv) ^ linea_este(bloq)
     else:
         return linea_este(pieza_indiv)
 
-def ataca_oeste(pieza_indiv, tablero, color):
+def ataca_oeste(pieza_indiv, tablero, color):  #retorna moviemientos  de  ataque  de torres(desde el oeste) tomando como referencia si el cuadrado esta bloquedado
     bloq = msb(linea_oeste(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_oeste(pieza_indiv) ^ linea_oeste(bloq)
     else:
         return linea_oeste(pieza_indiv)
 
-def rango_ataca(pieza_indiv, tablero, color):
+def rango_ataca(pieza_indiv, tablero, color): #retorna el color de la torre que ataco(desde el este y desde el oeste)
     return ataca_este(pieza_indiv, tablero, color) | ataca_oeste(pieza_indiv, tablero, color)
 
-def ataca_norte(pieza_indiv, tablero, color):
+def ataca_norte(pieza_indiv, tablero, color): #retorna moviemientos  de  ataque  de torres(desde el norte) tomando como referencia si el cuadrado esta bloquedado
     bloq = lsb(linea_norte(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_norte(pieza_indiv) ^ linea_norte(bloq)
     else:
         return linea_norte(pieza_indiv)
 
-def ataca_sur(pieza_indiv, tablero, color):
+def ataca_sur(pieza_indiv, tablero, color): #retorna moviemientos  de  ataque  de torres(desde el sur) tomando como referencia si el cuadrado esta bloquedado
     bloq = msb(linea_sur(pieza_indiv) & ocupado_casilleros(tablero))
     if bloq:
         return linea_sur(pieza_indiv) ^ linea_sur(bloq)
     else:
         return linea_sur(pieza_indiv)
 
-def fila_ataca(pieza_indiv, tablero, color):
+def fila_ataca(pieza_indiv, tablero, color):    #retorna el color de la torre que ataco(desde el norte y desde el sur)
     return ataca_norte(pieza_indiv, tablero, color) | ataca_sur(pieza_indiv, tablero, color)
 
-def torre_ataca(moviendo_pieza, tablero, color):
+def torre_ataca(moviendo_pieza, tablero, color): #retorna el rango de ataque segun su moviemiento (fila y rango numerico )
     atq = 0
     for pieza_indiv in indiv_gen(moviendo_pieza):
         atq |= rango_ataca(pieza_indiv, tablero, color) | fila_ataca(pieza_indiv, tablero, color)
     return atq
 
-def torre_movimientos(moviendo_pieza, tablero, color):
+def torre_movimientos(moviendo_pieza, tablero, color): #retorna el espacio de ataque de la torre pero no su color
     return torre_ataca(moviendo_pieza, tablero, color) & nnot(get_piezas_color(tablero, color))
 
 # ========== REINA ==========
@@ -881,7 +884,8 @@ def queen_ataca(moviendo_pieza, tablero, color):
 def queen_movimientos(moviendo_pieza, tablero, color):
     return alfil_movimientos(moviendo_pieza, tablero, color) | torre_movimientos(moviendo_pieza, tablero, color)
 
-# ===========================
+
+
 
 # =========PARTE3============
 
