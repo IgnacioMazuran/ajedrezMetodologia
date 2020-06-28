@@ -194,17 +194,11 @@ def juega_con(juega, color):
                         set_titulo(VENTANA_TITULO)
                         print_tablero(juega.tablero, color)
                         ongoing = True
-                    if event.key == 99: 	# tecla C - Cambia Color de Tablero
-                        global TABLERO_COLOR
-                        new_colores = deepcopy(TABLERO_COLORES)
-                        new_colores.remove(TABLERO_COLOR)
-                        TABLERO_COLOR = choice(new_colores)
-                        print_tablero(juega.tablero, color)
                     if event.key == 112: # tecla P - Historial de Posiciones
                         print(juega.get_mov_list() + '\n')
                         print('\n'.join(juega.posicion_historial))
                     if event.key == 101: 	# tecla E - Evalua puntaje del juego
-                        print('eval = ' + str(ajedrezLogica.evalua_juego(juega)/100))
+                        print('puntaje actual = ' + str(ajedrezLogica.evalua_juego(juega)/100))
 
     except:
         print(format_exc(), file=stderr)
