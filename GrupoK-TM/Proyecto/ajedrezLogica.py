@@ -1,6 +1,7 @@
 from copy import deepcopy
 from random import choice
 from time import sleep, time
+
 #mascara de colores donde se ubican  las piezas (Blanco y Negro)
 COLOR_MASK = 1 << 3
 BLANCO = 0 << 3
@@ -1328,18 +1329,19 @@ def get_AI_movim(juega, profund=2):
 #imprime salida por pantalla
 def print_salida(juega):
     print(get_salida(juega))
+
 #obtiene salida
 def get_salida(juega):
     if juego_ahogado(juega):
         return 'Empate por Juego Ahogado'
     if jaquemate(juega, BLANCO):
-        return 'NEGRAS ganan!'
+        return '=== NEGRAS GANAN!!!! ==='
     if jaquemate(juega, NEGRO):
-        return 'BLANCAS ganan!'
+        return '=== BLANCAS GANAN!!!! ==='
     if material_insuficiente(juega):
-        return 'Empate por piezas insuficientes!'
+        return 'Empate por piezas insuficientes!!!'
     if menos_75_movim_regla(juega):
-        return 'Empate por regla de los 75 movimientos!'
+        return 'Empate por regla de los 75 movimientos!!!'
 
 #==== MODOS DE JUEGO ====
 
@@ -1375,16 +1377,6 @@ def juega_con_negras(juega=Juega()):
         juega = mueve(juega, get_movim_usuario(juega))
     print_salida(juega)
 
-def modo_espectador(juega=Juega(), sleep_seconds=0):
-    print('Modo espectador:  AI vs AI ')
-    while True:
-        print_tablero(juega.tablero)
-        if finaliza_juego(juega):
-            break
-                
-        juega = mueve(juega, get_AI_movim(juega))
-        sleep(sleep_seconds)
-    print_salida(juega)
 
 def juega_con(color):
     if color == BLANCO:

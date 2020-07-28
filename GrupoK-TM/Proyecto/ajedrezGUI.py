@@ -5,6 +5,8 @@ from traceback import format_exc
 from sys import stderr
 from time import strftime
 from copy import deepcopy
+
+
 pygame.init()
 #Asigno tamaño que despues lo mutiplcaremos por 8 para que se vea la ventana
 CASILLERO_TAM = 65
@@ -38,7 +40,7 @@ RELOJ_TICK = 15
 #Le doy las dimesiones al tablero (8,8)para que este pareja
 # Creo una variable string que lleva el titulo de la ventana
 VENTANA = pygame.display.set_mode((8*CASILLERO_TAM, 8*CASILLERO_TAM))
-VENTANA_TITULO = 'AJEDREZ - Metodologia de la Investigacion 2020'
+VENTANA_TITULO = 'AJEDREZ - MI2020'
 #Pongo imagen del icono del juego para la ventana de visualización con image.load
 #Pongo el título de la ventana actual usando pygame.set_caption() 
 pygame.display.set_icon(pygame.image.load('imagenes/icono.ico'))
@@ -219,5 +221,3 @@ def juega_con_aleatorio(juega=ajedrezLogica.Juega()):
     juega_con(juega, color)
 
 juega_con_aleatorio()
-
-
